@@ -48,6 +48,7 @@ python train_net.py --config configs/dyhead_swint_atss_fpn_2x_ms.yaml --num-gpus
 
 - 메모리 문제 등의 경우로 인해 Batch Size를 조정해야 할 경우, `configs/dyhead_swint_atss_fpn_2x_ms.yaml`에서 배치 크기를 조정하자
 - `train_net.py`에서 호출할 파일 디렉토리 등을 설정한다. 
+- 현재 `config`에 반영되어 있지만, 기존의 코드로 DyHead로는 돌아가지 않는다. yaml 파일에서 `  WEIGHT_DECAY_BIAS`을 설정해야 한다.
 ```
 def setup(args):
     """
