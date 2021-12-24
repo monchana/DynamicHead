@@ -20,7 +20,10 @@ def add_extra_config(cfg):
     # extra configs for atss
     cfg.MODEL.ATSS = CN()
     cfg.MODEL.ATSS.TOPK = 9
-    cfg.MODEL.ATSS.NUM_CLASSES = 80
+    
+    # TODO
+    cfg.MODEL.ATSS.NUM_CLASSES = 3
+    
     cfg.MODEL.ATSS.IN_FEATURES = ["p3", "p4", "p5", "p6", "p7"]
     cfg.MODEL.ATSS.NUM_CONVS = 4
     cfg.MODEL.ATSS.CHANNELS = 256

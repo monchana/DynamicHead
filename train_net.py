@@ -32,6 +32,7 @@ from detectron2.utils.logger import setup_logger
 from dyhead import add_dyhead_config
 from extra import add_extra_config
 
+from detectron2.data.datasets import register_coco_instances
 
 class Trainer(DefaultTrainer):
     """
@@ -168,13 +169,27 @@ def setup(args):
     """
     Create configs and perform basic setups.
     """
+
+    # TODO : Edit
+    rideflux_train_json = ''
+    rideflux_train_img = ''
+    register_coco_instances('rideflux_train', {}, rideflux_train_json, rideflux_train_img)
+    
+    rideflux_val_json = ''
+    rideflux_val_img = ''
+    register_coco_instances('rideflux_val', {}, rideflux_val_json, rideflux_val_img)
+
     cfg = get_cfg()
     add_dyhead_config(cfg)
     add_extra_config(cfg)
-    cfg.merge_from_file(args.config_file)
-    cfg.merge_from_list(args.opts)
+
     cfg.freeze()
     default_setup(cfg, args)
+
+    cfg.merge_from_file(args.config_file)
+    cfg.merge_from_list(args.opts)
+    
+    print(cfg.DATASETS.TRAIN)
     return cfg
 
 

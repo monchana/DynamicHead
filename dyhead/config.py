@@ -10,3 +10,6 @@ def add_dyhead_config(cfg):
     cfg.MODEL.DYHEAD.NUM_CONVS = 6
     # the channels of convolutions used in the cls and bbox tower
     cfg.MODEL.DYHEAD.CHANNELS = 256
+
+    # TODO
+    cfg.MODEL.ROI_HEADS.NUM_CLASSEES = 3

@@ -1,46 +1,36 @@
 
 <div align="center">   
 
-# Dynamic Head: Unifying Object Detection Heads with Attentions
+# RideFlux AI Challenge : Object Detection
 </div>
 
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/dynamic-head-unifying-object-detection-heads/object-detection-on-coco-minival)](https://paperswithcode.com/sota/object-detection-on-coco-minival?p=dynamic-head-unifying-object-detection-heads)
-[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/dynamic-head-unifying-object-detection-heads/object-detection-on-coco)](https://paperswithcode.com/sota/object-detection-on-coco?p=dynamic-head-unifying-object-detection-heads)
+Microsoft의 [Dynamic Head](git@github.com:microsoft/DynamicHead.git)에서 Fork한 저장소.
 
-https://user-images.githubusercontent.com/1438231/122347136-9282e900-cefe-11eb-8b36-ebe08736ec97.mp4
+Object Detection에 쓰일 모델을 학습하고 Inference한다. 
 
-
-This is the official implementation of CVPR 2021 paper "Dynamic Head: Unifying Object Detection Heads with Attentions". 
-
-_"In this paper, we present a novel dynamic head framework to unify object detection heads with attentions. 
-By coherently combining multiple self-attention mechanisms between feature levels for scale-awareness, among spatial locations for spatial-awareness, and within output channels for task-awareness, the proposed approach significantly improves the representation ability of object detection heads without any computational overhead."_
-
-
->[**Dynamic Head: Unifying Object Detection Heads With Attentions**](https://arxiv.org/pdf/2106.08322.pdf)
->
->[Xiyang Dai](https://scholar.google.com/citations?user=QC8RwcoAAAAJ&hl=en), [Yinpeng Chen](https://scholar.google.com/citations?user=V_VpLksAAAAJ&hl=en), [Bin Xiao](https://scholar.google.com/citations?user=t5HZdzoAAAAJ&hl=en), [Dongdong Chen](https://scholar.google.com/citations?user=sYKpKqEAAAAJ&hl=zh-CN), [Mengchen Liu](https://scholar.google.com/citations?user=cOPQtYgAAAAJ&hl=zh-CN), [Lu Yuan](https://scholar.google.com/citations?user=k9TsUVsAAAAJ&hl=en), [Lei Zhang](https://scholar.google.com/citations?user=fIlGZToAAAAJ&hl=en) 
+------
 
 
 ### Model Zoo
 
-~~Code and Model are under internal review and will release soon. Stay tuned!~~
-
-In order to open-source, we have ported the implementation from our internal framework to Detectron2 and re-train the models.
-
-We notice better performances on some models compared to original paper.
+모델을 학습하는데 필요한 Pretrained Model. 해당 모델을 다운로드 받고 `pretrained/` 폴더 밑에 저장하면 된다.
 
 | Config                                                                       |           Model         |   Backbone  | Scheduler | COCO mAP |  Weight                                                                                |       
-|------------------------------------------------------------------------------|-------------------------|-------------|-----------|----------|----------------------------------------------------------------------------------------|                                                                                                                                                      
-|  [cfg](configs/dyhead_r50_rcnn_fpn_1x.yaml)                                  |    FasterRCNN + DyHead  |   R50       | 1x        | 40.3     |  [weight](https://xiyang.blob.core.windows.net/public/dyhead_r50_rcnn_fpn_1x.pth)      |       
-|  [cfg](configs/dyhead_r50_retina_fpn_1x.yaml)                                |    RetinaNet + DyHead   |   R50       | 1x        | 39.9     |  [weight](https://xiyang.blob.core.windows.net/public/dyhead_r50_retina_fpn_1x.pth)    |            
-|  [cfg](configs/dyhead_r50_atss_fpn_1x.yaml)                                  |    ATSS + DyHead        |   R50       | 1x        | 42.4     |  [weight](https://xiyang.blob.core.windows.net/public/dyhead_r50_atss_fpn_1x.pth)      |   
+|------------------------------------------------------------------------------|-------------------------|-------------|-----------|----------|----------------------------------------------------------------------------------------|                                                                                              
 |  [cfg](configs/dyhead_swint_atss_fpn_2x_ms.yaml)                             |    ATSS + DyHead        |   Swin-Tiny | 2x + ms   | 49.8     |  [weight](https://xiyang.blob.core.windows.net/public/dyhead_swint_atss_fpn_2x_ms.pth) |    
 
+------
 
 ### Usage
 **Dependencies:**
 
 [Detectron2](https://detectron2.readthedocs.io/en/latest/tutorials/install.html), [timm](https://rwightman.github.io/pytorch-image-models/)
+
+Detectron2 저장소에서 Docker 설정을 하는 것을 매우 강하게 추천한다. 단, 이 경우 이러한 에러가 발생할 수 있다.
+> AttributeError: module 'distutils' has no attribute 'version'
+
+이 문제는 [여기](https://github.com/pytorch/pytorch/issues/69894#issuecomment-993805355)를 참고하여, Docker Container 내부 파일 `/usr/local/lib/python3.8/dist-packages/torch/utils/tensorboard/__init__.py `을 조금 변경하여 바꿔주면 된다. 
+
 
 **Installation:**
 
@@ -50,20 +40,43 @@ python -m pip install -e DynamicHead
 
 **Train:**
 
-To train a config on a single node with 8 gpus, simply use:
+GPU 4개로 학습할 경우,
+
 ```
-DETECTRON2_DATASETS=$DATASET python train_net.py --config configs/dyhead_r50_retina_fpn_1x.yaml --num-gpus 8
+python train_net.py --config configs/dyhead_swint_atss_fpn_2x_ms.yaml --num-gpus 4
 ```
+
+- 메모리 문제 등의 경우로 인해 Batch Size를 조정해야 할 경우, `configs/dyhead_swint_atss_fpn_2x_ms.yaml`에서 배치 크기를 조정하자
+- `train_net.py`에서 호출할 파일 디렉토리 등을 설정한다. 
+```
+def setup(args):
+    """
+    Create configs and perform basic setups.
+    """
+
+    # Set Train and Val data directories
+
+    return cfg
+```
+
+- 학습된 Weight 파일들은 `output/`에 저장된다.
+- 필요한 경우 `extra/config.py`의 `cfg.MODEL.ATSS.NUM_CLASSES`에서 클래스 개수를 조정한다.
+- 필요한 경우 `dyhead/config.py`의 `cfg.MODEL.ROI_HEADS.NUM_CLASSEES`에서 클래스 개수를 조정한다.
 
 **Test:**
 
-To test a config with a weight on a single node with 8 gpus, simply use:
+마찬가지로 Inference할 경우,
 ```
-DETECTRON2_DATASETS=$DATASET python train_net.py --config configs/dyhead_r50_retina_fpn_1x.yaml --num-gpus 8 --eval-only MODEL.WEIGHTS $WEIGHT
+python train_net.py --config configs/dyhead_swint_atss_fpn_2x_ms.yaml --num-gpus 4 --eval-only MODEL.WEIGHTS $WEIGHT
 ```
 
+- Inference 결과는 `output/inference`에 저장된다. 
+- 학습된 모델들 inference는 `command_list.sh`를 실행하여 전체 Evaluation 실행
 
-### Citation
+
+------
+
+### DynamicHead Citation
 
 ```BibTeX
 @InProceedings{Dai_2021_CVPR,
@@ -76,19 +89,4 @@ DETECTRON2_DATASETS=$DATASET python train_net.py --config configs/dyhead_r50_ret
 }
 ```
 
-
-
-### Contributing
-
-This project welcomes contributions and suggestions.  Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
-
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
-
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 

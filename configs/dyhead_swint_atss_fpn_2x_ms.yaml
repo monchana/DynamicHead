@@ -1,6 +1,6 @@
 MODEL:
   META_ARCHITECTURE: "ATSS"
-  WEIGHTS: "swin_tiny_patch4_window7_224_d2.pth"
+  WEIGHTS: "/home/playground/DynamicHead/pretrained/dyhead_swint_atss_fpn_2x_ms.pth"
   PIXEL_MEAN: [123.675, 116.28, 103.53]
   PIXEL_STD: [58.395, 57.12, 57.375]
   BACKBONE:
@@ -19,12 +19,13 @@ MODEL:
   ATSS:
     NUM_CONVS: 0
 DATASETS:
-  TRAIN: ("coco_2017_train",)
-  TEST: ("coco_2017_val",)
+  TRAIN: ('rideflux_train',)
+  TEST: ('rideflux_val',)
 SOLVER:
-  IMS_PER_BATCH: 32
+  IMS_PER_BATCH: 24
   BASE_LR: 0.0001
   WEIGHT_DECAY: 0.05
+  WEIGHT_DECAY_BIAS: 0.05
   STEPS: (60000, 80000)
   MAX_ITER: 90000
   OPTIMIZER: "ADAMW"
